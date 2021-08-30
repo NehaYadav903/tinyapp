@@ -33,9 +33,11 @@ const generateRandomString = function() {
 
   return randomString;
 };
+
+
 app.get("/", (req, res) => {
   res.send("Hello!");
-});
+}); 
 
  // displays "Hello World" message
  app.get("/hello", (req, res) => {
@@ -47,6 +49,17 @@ app.get("/", (req, res) => {
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 
+// to redirect to long URL
+app.get('/u/:id', (req, res) => {
+  const longUrl = urlDatabase[req.params.id].longURL;
+  res.redirect(longUrl);
+});
+
+// to redirect to long URL
+app.get("/u/:shortURL", (req, res) => {
+  const longUrl = urlDatabase[req.params.id].longURL;
+  res.redirect(longURL);
+});
 
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
@@ -72,11 +85,19 @@ app.get("/urls.json", (req, res) => {
 
 // Redirects to the responding long URL
 app.get("/urls/:shortURL", (req, res) => {
-  const templateVars = { 
-    shortURL: req.params.shortURL, 
-    longURL: req.params.longURL
-  };
-  res.render("urls_show", templateVars);
+  let userId = req.session.userId;
+  const shortURL = req.params.shortURL;
+
+  const templateVars = {
+    shortURL: shortURL,
+    longURL: urlDatabase[shortURL].longURL,
+    user: users[userId],
+    error: users[userId] ? null : "Please Login or Register first" };
+  if (userId) {
+    res.render("urls_show", templateVars);
+  } else {
+    res.redirect("/urls");
+  }
 });
 
 
