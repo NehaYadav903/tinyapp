@@ -21,15 +21,20 @@ app.get("/set", (req, res) => {
   res.send(`a = ${a}`);
  });
 
+ app.get("/hello", (req, res) => {
+  const templateVars = { greeting: 'Hello World!' };
+  res.render("hello_world", templateVars);
+});
+
+app.get("/urls/new", (req, res) => {
+  res.render("urls_new");
+});
+
  app.get("/urls", (req, res) => { //add a new route handler
   const templateVars = { urls: urlDatabase };
   res.render("urls_index", templateVars);
 });
 
-app.get("/hello", (req, res) => {
-  const templateVars = { greeting: 'Hello World!' };
-  res.render("hello_world", templateVars);
-});
 
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);//JSON string representing the entire urlDatabase object
