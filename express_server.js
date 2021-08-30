@@ -11,6 +11,7 @@ const urlDatabase = {
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
+
 app.get("/set", (req, res) => {
   const a = 1;
   res.send(`a = ${a}`);
@@ -19,17 +20,27 @@ app.get("/set", (req, res) => {
  app.get("/fetch", (req, res) => {
   res.send(`a = ${a}`);
  });
+
  app.get("/urls", (req, res) => { //add a new route handler
   const templateVars = { urls: urlDatabase };
   res.render("urls_index", templateVars);
 });
+
 app.get("/hello", (req, res) => {
   const templateVars = { greeting: 'Hello World!' };
   res.render("hello_world", templateVars);
 });
-app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}!`)
-});
+
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);//JSON string representing the entire urlDatabase object
 });
+
+app.get("/urls/:shortURL", (req, res) => {
+  const templateVars = { shortURL: req.params.shortURL, longURL: req.params.longURL};
+  res.render("urls_show", templateVars);
+});
+
+app.listen(PORT, () => {
+  console.log(`Example app listening on port ${PORT}!`)
+});
+
