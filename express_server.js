@@ -3,6 +3,7 @@ const app = express();
 
 //middleware
 const bodyParser = require('body-parser')
+app.use(bodyParser.urlencoded({extended: true}));
 
 // default port 8080
 const PORT = 8080; 
@@ -17,23 +18,15 @@ const urlDatabase = {
 };
 
 //CREATE random string for shortURL
-const generateRandomString = function() {
-  let randomString = '';
 
-  //Generate string based off these alphanumeric characters
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  const charactersLength = characters.length;
-  for (let i = 0; i < 6; i++) {
-    randomString += characters.charAt(Math.floor(Math.random() * charactersLength));
+function generateRandomString() {
+  let chars = "0123456789abcdefghijklmnopqrstuvwxyz";
+  let result = "";
+  for (let i = 0; i < 6; i ++) {
+    result += chars.charAt(Math.floor(Math.random() * 36));
   }
-  //Generate a new ID if ID is already used
-  if (findUserByID(randomString)) {
-    generateRandomString();
-  }
-
-  return randomString;
-};
-
+  return result;
+}
 
 app.get("/", (req, res) => {
   res.send("Hello!");
@@ -81,6 +74,14 @@ app.post("/urls", (req, res) => {
 //JSON string representing the entire urlDatabase object
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
+});
+
+// deleting urls
+app.post("/urls/:shortURL/delete", (req, res) => {
+  let short = req.params.shortURL;
+  
+  delete urlDatabase[short];
+  res.redirect("/urls");
 });
 
 // Redirects to the responding long URL
