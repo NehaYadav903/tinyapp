@@ -3,20 +3,20 @@ const app = express();
 
 //middleware
 const bodyParser = require('body-parser')
-app.use(bodyParser.urlencoded({extended: true}));
 
 // default port 8080
 const PORT = 8080; 
 
 //Use EJS as its templating engine
 app.set("view engine", "ejs");
+app.use(express.json());
+app.use(bodyParser.urlencoded({extended: true}));
 
 // example of users' url database
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  "b2xVn2": {longURL: "http://www.lighthouselabs.ca" },
+  "9sm5xK": {longURL: "http://www.google.com" }
 };
-
 //CREATE random string for shortURL
 
 function generateRandomString() {
@@ -27,80 +27,65 @@ function generateRandomString() {
   }
   return result;
 }
-
-app.get("/", (req, res) => {
-  res.send("Hello!");
-}); 
-
- // displays "Hello World" message
- app.get("/hello", (req, res) => {
-  const templateVars = { greeting: 'Hello World!' };
-  res.render("hello_world", templateVars);
-});
-
-// app.use(bodyParser())
-app.use(express.urlencoded({extended: true}));
-app.use(express.json());
-
-// to redirect to long URL
-app.get('/u/:id', (req, res) => {
-  const longUrl = urlDatabase[req.params.id].longURL;
-  res.redirect(longUrl);
-});
-
-// to redirect to long URL
-app.get("/u/:shortURL", (req, res) => {
-  const longUrl = urlDatabase[req.params.id].longURL;
-  res.redirect(longURL);
-});
-
+// to display urls index page
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
 
-//// to display urls index page
- app.get("/urls", (req, res) => { 
+// to display urls index page
+app.get("/urls", (req, res) => { 
   const templateVars = { urls: urlDatabase };
   res.render("urls_index", templateVars);
 });
-
-// Log the POST request body to the console
-// Respond with 'Ok' (we will replace this)
+// display short URL
+app.get("/urls/:shortURL", (req, res) => {
+  const templateVars = { shortURL: req.params.shortURL, longURL: req.body.longURL };
+  res.render("urls_show", templateVars);
+});
 app.post("/urls", (req, res) => {
-  console.log(req.body);  
-  res.send("Ok");        
+  console.log(req.body);  // Log the POST request body to the console
+  res.send("Ok");         // Respond with 'Ok' (we will replace this)
 });
 
-//JSON string representing the entire urlDatabase object
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
+// to redirect to long URL
+app.get("/u/:shortURL", (req, res) => {
+  const longUrl = urlDatabase[req.params.shortURL].longURL;
+  res.redirect(longURL);
 });
 
 // deleting urls
 app.post("/urls/:shortURL/delete", (req, res) => {
   let short = req.params.shortURL;
-  
   delete urlDatabase[short];
   res.redirect("/urls");
 });
 
-// Redirects to the responding long URL
-app.get("/urls/:shortURL", (req, res) => {
-  let userId = req.session.userId;
-  const shortURL = req.params.shortURL;
+app.post("/urls/:shortURL/edit", (req, res) => {
+  let short = req.params.shortURL;
+  urlDatabase[short].longURL = req.body.longURL;
+  res.redirect(`/urls`);
+});
 
-  const templateVars = {
-    shortURL: shortURL,
-    longURL: urlDatabase[shortURL].longURL,
-    user: users[userId],
-    error: users[userId] ? null : "Please Login or Register first" };
-  if (userId) {
-    res.render("urls_show", templateVars);
-  } else {
+// Log the POST request body to the console
+
+app.post("/urls", (req, res) => {
+  user_id = req.session["user_id"];
+  if (req.session["user_id"]) {
+    let short = generateRandomString();
+    urlDatabase[short] = {
+      longURL: req.body.longURL,
+      userID: user_id };
+    res.redirect(`/urls/${short}`);
+  
+  } else { 
     res.redirect("/urls");
   }
 });
 
+//JSON string representing the entire urlDatabase object
+app.get("/urls.json", (req, res) => {
+  res.json(urlDatabase);
+})
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`)
