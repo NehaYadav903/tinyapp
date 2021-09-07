@@ -5,11 +5,11 @@ In this app, users can create their own urls also, they can try deleting and edi
 
 ## Final Product
 
-!["Urls_EditPage.png"](#)
-!["Urls_login.png"](#)
-!["Urls_NewUrl.png"](#)
-!["Urls_Register.png"](#)
-!["Urls.png"](#)
+!["Screenshot of Edit page"](https://github.com/NehaYadav903/tinyapp/blob/main/docs/Urls_EditPage.png)
+!["Screenshot of NewUrl page"](https://github.com/NehaYadav903/tinyapp/blob/main/docs/Urls_NewUrl.png)
+!["Screenshot of Login page"](https://github.com/NehaYadav903/tinyapp/blob/main/docs/Urls_Login.png)
+!["Screenshot of Register Page"](https://github.com/NehaYadav903/tinyapp/blob/main/docs/Urls_Register.png)
+!["Screenshot of Urls Page](https://github.com/NehaYadav903/tinyapp/blob/main/docs/Urls.png)
 
 ## Dependencies
 
