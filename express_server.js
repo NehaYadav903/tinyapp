@@ -16,12 +16,12 @@ app.use(cookieSession({
 
 let count = 0;
 app.use((req, res, next) => {
-  console.log("I've been hit ${count} time")
+  console.log("I've been hit ${count} time");
   count++;
-next()
+  next();
 });
 
-  app.set("view engine", "ejs"); // Enables EJS for rendering the pages
+app.set("view engine", "ejs"); // Enables EJS for rendering the pages
 
 const urlDatabase = {
   b6UTxQ: { longURL: "https://www.tsn.ca", userID: "aJ48lW" },
