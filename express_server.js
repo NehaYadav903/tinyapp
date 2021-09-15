@@ -65,7 +65,9 @@ app.get('/u/:id', (req, res) => {
 // Generate a new short URL from a long URL
 app.get("/urls/new", (req, res) => {
   let userId = req.session.user_id;
-  const templateVars = { user: users[userId] };
+  const templateVars = { 
+    user: users[userId]
+  };
   if (users[userId]) {
     res.render("urls_new", templateVars);
   } else {
@@ -91,13 +93,19 @@ app.get("/urls/:shortURL", (req, res) => {
 
 app.get('/login', (req, res) => {
   let userId = req.session.user_id;
-  const templateVars = {user: users[userId], error: null};
+  const templateVars = {
+    user: users[userId], 
+    error: null
+  };
   res.render('login', templateVars);
 });
   
 
 app.get("/register", (req, res) => {
-  const templateVars = {user: null, error: null};
+  const templateVars = {
+    user: null,
+    error: null
+  };
   res.render('register', templateVars);
 });
 
