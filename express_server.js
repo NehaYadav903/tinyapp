@@ -16,7 +16,7 @@ app.use(cookieSession({
 
 let count = 0;
 app.use((req, res, next) => {
-  console.log("I've been hit ${count} time");
+  console.log("I've been hit{" + count +  "}time");
   count++;
   next();
 });
@@ -30,6 +30,7 @@ const urlDatabase = {
 
 const users = {};
 
+// main Login page
 app.get("/", (req, res) => {
   if (req.session.user_id) {
     res.redirect('/urls');
@@ -47,16 +48,22 @@ app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
 
+//if user logged in should go to make a new url
 app.get("/urls", (req, res) => {
   let userId = req.session.user_id;
   const templateVars = {
     urls: urlsForUser(userId, urlDatabase),
     user: users[userId],
-    error: users[userId] ? null : "Please Login or Register first"
   };
-  res.render("urls_index", templateVars);
+  if (userId) {
+    res.render("urls_index", templateVars);
+  } else {
+    res.render("urls_error", templateVars);
+  }
+  
 });
 
+// to redirect to long URL
 app.get('/u/:id', (req, res) => {
   const longUrl = urlDatabase[req.params.id].longURL;
   res.redirect(longUrl);
@@ -65,20 +72,21 @@ app.get('/u/:id', (req, res) => {
 // Generate a new short URL from a long URL
 app.get("/urls/new", (req, res) => {
   let userId = req.session.user_id;
-  const templateVars = { 
-    user: users[userId]
-  };
   if (users[userId]) {
+    const templateVars = { 
+      user: users[userId]
+    };
     res.render("urls_new", templateVars);
   } else {
-    res.redirect('/urls');
+    res.redirect('/login');
   }
+  
 });
 
+// Redirects to the responding long URL
 app.get("/urls/:shortURL", (req, res) => {
   let userId = req.session.user_id;
   const shortURL = req.params.shortURL;
-
   const templateVars = {
     shortURL: shortURL,
     longURL: urlDatabase[shortURL].longURL,
@@ -91,6 +99,7 @@ app.get("/urls/:shortURL", (req, res) => {
   }
 });
 
+// to show login page
 app.get('/login', (req, res) => {
   let userId = req.session.user_id;
   const templateVars = {
@@ -100,7 +109,7 @@ app.get('/login', (req, res) => {
   res.render('login', templateVars);
 });
   
-
+// to show register page
 app.get("/register", (req, res) => {
   const templateVars = {
     user: null,
@@ -120,6 +129,7 @@ app.post("/urls", (req, res) => {
   }
 });
 
+// deleting urls
 app.post('/urls/:shortURL/delete', (req, res) => {
   let userId = req.session.user_id;
   const shortURL = req.params.shortURL;
@@ -133,6 +143,7 @@ app.post('/urls/:shortURL/delete', (req, res) => {
   }
 });
 
+//if user logged in it should update long Url and redirect to my urls page
 app.post('/urls/:shortURL', (req, res) => {
   let userId = req.session.user_id;
   const shortURL = req.params.shortURL;
@@ -146,6 +157,7 @@ app.post('/urls/:shortURL', (req, res) => {
   }
 });
 
+// Login user and stored user Id in session
 app.post('/login', (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
@@ -165,11 +177,13 @@ app.post('/login', (req, res) => {
   }
 });
 
+//when user logged out, cookie session deletes immediately
 app.post('/logout', (req, res) => {
   req.session = null;
   res.redirect("/urls");
 });
 
+// checking users' duplication of email and password
 app.post('/register', (req, res) => {
   const userId = randomValue(6);
   if (req.body.email === '' || req.body.password === '' || getUserByEmail(req.body.email, users)) {
