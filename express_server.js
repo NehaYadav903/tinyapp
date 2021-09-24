@@ -159,20 +159,33 @@ app.post('/urls/:shortURL', (req, res) => {
 
 // Login user and stored user Id in session
 app.post('/login', (req, res) => {
+  console.log('++++++', req.body);
   const email = req.body.email;
   const password = req.body.password;
+  const templateVars = {};
+  
+  if (!email || !password) {
+    templateVars.error = 'Email and password are required';
+    templateVars.user = null;
+    return res.render('login', templateVars);
+  }
+  
   const user = getUserByEmail(email, users);
+  if (!user) {
+    templateVars.error = 'Email is not registerd. Please register to continue';
+    templateVars.user = null;
+    return res.render('login', templateVars);
+  }
   const userId = user ? user.id : null;
   if (users[userId] && bcrypt.compareSync(password, users[userId].password)) {
     // eslint-disable-next-line
     req.session.user_id = userId;
     res.redirect("/urls");
+  
   } else {
     res.status(403);
-    const templateVars = {
-      user: null,
-      error: 'Please check your email or password'
-    };
+    templateVars.user = null;
+    templateVars.error = 'Please check your email or password';
     res.render('login', templateVars);
   }
 });
